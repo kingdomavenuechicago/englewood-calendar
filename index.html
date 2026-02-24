@@ -192,6 +192,29 @@ var CATS = {
   'Fundraisers & Galas':'#FFD700'
 };
 
+
+var CAT_FALLBACK = {
+  'ka1':'Youth / Education / Family',
+  'ka2':'Youth / Education / Family',
+  'ka3':'Youth / Education / Family',
+  'ka4':'Youth / Education / Family',
+  'ka5':'Fundraisers & Galas',
+  'p1':'General Community',
+  'p2':'Safety & Awareness',
+  'p3':'Health & Wellness',
+  'p4':'General Community',
+  'p5':'Meetings & Convenings',
+  'p6':'Jobs & Economic Wellness',
+  'p7':'Resources & Services',
+  'p8':'General Community',
+  'p9':'Meetings & Convenings',
+  'p10':'General Community',
+  'p11':'Resources & Services',
+  'p12':'Youth / Education / Family',
+  'p13':'Resources & Services',
+  'p14':'General Community'
+};
+
 function catColor(cat){ return CATS[cat] || '#6B1A2A'; }
 
 var EVENTS = [];
@@ -214,7 +237,7 @@ function parseCSV(text) {
       social:   (row[7]||'').trim(),
       recurrence:(row[8]||'').trim().toLowerCase(),
       end_date: (row[9]||'').trim(),
-      cat:      (row[10]||'').trim(),
+      cat:      (row[10]||'').trim() || CAT_FALLBACK[row[0]||''] || '',
       audience: (row[11]||'').trim()
     });
   }
