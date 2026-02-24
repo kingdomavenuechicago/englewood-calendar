@@ -194,27 +194,62 @@ var CATS = {
 
 function catColor(cat){ return CATS[cat] || '#6B1A2A'; }
 
-var EVENTS = [
-  {id:'ka1',name:'State of the Youth',org:'Kingdom Avenue Inc.',date:'2026-06-06',desc:'A convening of summer youth resource partners to celebrate and coordinate as students get out for summer break. CPS last day is June 4 — this kicks off the season!',pub:true,ka:true,social:'',cat:'Youth / Education / Family',audience:''},
-  {id:'ka2',name:'Builders Program Begins',org:'Kingdom Avenue Inc.',date:'2026-06-22',desc:'The Builders youth development program runs June 22 through August 21. Six-week enrichment and workforce readiness programming for Englewood youth.',pub:false,ka:true,social:'',cat:'Youth / Education / Family',audience:''},
-  {id:'ka3',name:'ESTY — Back-to-School Block Party',org:'Kingdom Avenue Inc.',date:'2026-08-01',desc:"Kingdom Avenue's HBCU-style back-to-school celebration for Englewood youth and families. Music, resources, joy, and community pride on full display.",pub:true,ka:true,social:'',cat:'Youth / Education / Family',audience:''},
-  {id:'ka4',name:'Builders Program Ends',org:'Kingdom Avenue Inc.',date:'2026-08-21',desc:'Final day of the Builders summer youth development program.',pub:false,ka:true,social:'',cat:'Youth / Education / Family',audience:''},
-  {id:'ka5',name:'An Evening in Englewood',org:'Kingdom Avenue Inc.',date:'2026-09-25',desc:"Kingdom Avenue's annual fundraising gala celebrating the community and supporting the mission of creating a village for every child, one avenue at a time.",pub:true,ka:true,social:'',cat:'Fundraisers & Galas',audience:''},
-  {id:'p1',name:'UEC Capstone & Open House',org:'Grow Greater Englewood',date:'2026-02-28',desc:'Celebrate the achievements of the first Urban Earth Corps cohort! Hear reflections from participants and learn about the 2026 UEC program and application. All are welcome.',pub:true,ka:false,social:'',cat:'General Community',audience:''},
-  {id:'p2',name:'Englewood Souls to the Polls',org:'One Health Englewood',date:'2026-03-02',desc:'Civic engagement initiative encouraging early voting in Englewood and West Englewood for the March 17th Primary.',pub:true,ka:false,social:'',cat:'Safety & Awareness',audience:''},
-  {id:'p3',name:'Community Consortium Meeting',org:'UIC Healthy Start',date:'2026-03-12',desc:'Monthly consortium meeting (2nd Thursday) focused on maternal, infant, and family health in South Shore, Englewood, and Auburn-Gresham. Zoom at 2:00pm CST.',pub:true,ka:false,social:'',cat:'Health & Wellness',audience:''},
-  {id:'p4',name:'Englewood Sings!',org:'Uniting Voices Chicago',date:'2026-03-14',desc:'Seasonal showcase featuring the Englewood Neighborhood Choir — choral classics, world music, and original tunes. A celebration of the youth of Chicago.',pub:true,ka:false,social:'',cat:'General Community',audience:''},
-  {id:'p5',name:'16th Ward Community Meeting',org:'16th Ward Aldermanic Office',date:'2026-03-14',desc:'Aldermanic community meeting open to all 16th Ward residents.',pub:true,ka:false,social:'',cat:'Meetings & Convenings',audience:''},
-  {id:'p6',name:'College/Trade Expo',org:'The Rise Foundation',date:'2026-03-21',desc:'First annual College/Trade Expo. Connect, find your next step, and get educated on college and trade school processes. All are welcome!',pub:true,ka:false,social:'',cat:'Jobs & Economic Wellness',audience:''},
-  {id:'p7',name:'Community Give Away',org:'True Believers Community Connections',date:'2026-03-28',desc:'Community resource giveaway hosted by True Believers Community Connections.',pub:true,ka:false,social:'',cat:'Resources & Services',audience:''},
-  {id:'p8',name:"Mother's Day Celebration Brunch",org:'Grow Greater Englewood',date:'2026-05-09',desc:"Annual Mother's Day Brunch celebrating the mothers and caregivers of the Englewood community.",pub:true,ka:false,social:'',cat:'General Community',audience:''},
-  {id:'p9',name:'Chicago Cares Leadership Breakfast',org:'Chicago Cares',date:'2026-05-18',desc:'Annual leadership breakfast hosted by Chicago Cares.',pub:false,ka:false,social:'',cat:'Meetings & Convenings',audience:''},
-  {id:'p10',name:'Paint the Town Red',org:'Uniting Voices Chicago',date:'2026-05-21',desc:"One of Uniting Voices Chicago's largest events — singers from across Chicago performing together at Navy Pier.",pub:true,ka:false,social:'',cat:'General Community',audience:''},
-  {id:'p11',name:'Englewood Village Market — Opening Day',org:'Grow Greater Englewood',date:'2026-06-13',desc:'Opening day of the annual Farmers Market in Englewood Village. Fresh produce, community vendors, and connection every Saturday through the season.',pub:true,ka:false,social:'',cat:'Resources & Services',audience:''},
-  {id:'p12',name:'Back to School',org:'The Big Heart Project',date:'2026-08-08',desc:'Back to School event hosted by The Big Heart Project for Englewood families.',pub:true,ka:false,social:'',cat:'Youth / Education / Family',audience:''},
-  {id:'p13',name:'Labor of Love',org:'ChiGivesBack',date:'2026-08-16',desc:'Annual back-to-school event providing free haircuts and school supplies to CPS students. 1,100+ backpacks, haircuts, and health screenings in 2024.',pub:true,ka:false,social:'',cat:'Resources & Services',audience:''},
-  {id:'p14',name:'Friendsgiving',org:'ChiGivesBack',date:'2026-11-21',desc:'Annual Friendsgiving providing warm holiday meals to families in Englewood and Garfield Park during Thanksgiving season.',pub:true,ka:false,social:'',cat:'General Community',audience:''}
-];
+var EVENTS = [];
+var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7SFf_odQbwsFninR6qQIYfAU5-7Ruvwxn0LhLk6y3lMV_INIG3ROQRzH535MxFDvhGM34G6CxxDje/pub?gid=1649290694&single=true&output=csv";
+
+function parseCSV(text) {
+  var lines = text.trim().split('\n');
+  var results = [];
+  for (var i = 1; i < lines.length; i++) {
+    var row = splitRow(lines[i]);
+    if (!row[1] || !row[3]) continue;
+    results.push({
+      id:       (row[0]||'ev'+i).trim(),
+      name:     (row[1]||'').trim(),
+      org:      (row[2]||'').trim(),
+      date:     (row[3]||'').trim(),
+      desc:     (row[4]||'').trim(),
+      pub:      (row[5]||'').trim().toLowerCase()==='yes',
+      ka:       (row[6]||'').trim().toLowerCase()==='yes',
+      social:   (row[7]||'').trim(),
+      recurrence:(row[8]||'').trim().toLowerCase(),
+      end_date: (row[9]||'').trim(),
+      cat:      (row[10]||'').trim(),
+      audience: (row[11]||'').trim()
+    });
+  }
+  return results;
+}
+
+function splitRow(row) {
+  var result=[],cur='',inQ=false;
+  for(var i=0;i<row.length;i++){
+    var c=row[i];
+    if(c==='"'){inQ=!inQ;}
+    else if(c===','&&!inQ){result.push(cur);cur='';}
+    else{cur+=c;}
+  }
+  result.push(cur);
+  return result;
+}
+
+function loadAndRender() {
+  fetch(CSV_URL)
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      EVENTS = parseCSV(text);
+      // Update stats
+      var orgs={};
+      EVENTS.forEach(function(e){orgs[e.org]=true;});
+      document.getElementById('ecc-ecount').textContent = EVENTS.length;
+      document.getElementById('ecc-ocount').textContent = Object.keys(orgs).length;
+      renderList();
+    })
+    .catch(function(){
+      // Fallback to hardcoded events if fetch fails
+      renderList();
+    });
+}
 
 var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var filt = 'all';
@@ -380,7 +415,7 @@ window.eccCopy=function(url){
 };
 
 // Init
-renderList();
+loadAndRender();
 
 })();
 </script>
